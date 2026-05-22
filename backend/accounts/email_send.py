@@ -62,8 +62,13 @@ def _send_via_resend(*, to: str, subject: str, body: str) -> None:
         timeout=30,
     )
     if response.status_code >= 400:
-        raise EmailDeliveryError(f"Resend API error: {response.status_code} {response.text}")
-    logger.info("Resend email sent to %s", to)
+        logger.error("Resend API rejected email to %s: %s", to, response.text)
+        raise EmailDeliveryError(
+            f"Resend could not send to {to}. "
+            f"If you use onboarding@resend.dev, you can only email your Resend account address "
+            f"until you verify a domain at resend.com/domains. Details: {response.text}"
+        )
+    logger.info("Resend email accepted for %s (id=%s)", to, response.json().get("id", "?"))
 
 
 def _send_via_gmail_api(*, to: str, subject: str, body: str) -> None:

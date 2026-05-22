@@ -23,7 +23,11 @@ export function AdminHomePage() {
 
   const cards = [
     { label: "Mentees", value: stats.users_by_role.mentee ?? 0, to: "/admin-dashboard/mentees" },
-    { label: "Mentors", value: stats.users_by_role.mentor ?? 0, to: "/admin-dashboard/mentors" },
+    {
+      label: "Mentors (all statuses)",
+      value: stats.users_by_role.mentor ?? 0,
+      to: "/admin-dashboard/mentors",
+    },
     {
       label: "Pending mentor requests",
       value: stats.pending_mentors,

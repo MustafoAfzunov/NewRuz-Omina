@@ -193,9 +193,10 @@ def email_status_view(request):
             "resend_configured": method == "resend",
             "frontend_url": getattr(settings, "FRONTEND_URL", ""),
             "debug": settings.DEBUG,
+            "resend_from": os.environ.get("RESEND_FROM_EMAIL", ""),
             "hint": (
-                "Render blocks SMTP. Use RESEND_API_KEY (recommended) or GOOGLE_MAIL_REFRESH_TOKEN "
-                "with gmail.send scope on newruz-api."
+                "Render blocks SMTP. With onboarding@resend.dev you can only send to your Resend "
+                "signup email until you verify a domain at resend.com/domains."
             ),
         }
     )

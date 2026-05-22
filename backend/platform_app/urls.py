@@ -3,7 +3,13 @@ from rest_framework.routers import DefaultRouter
 
 from .messaging_views import ConversationViewSet
 from .program_enrollment_views import my_programs
-from .admin_api import admin_mentor_approve, admin_mentor_reject, admin_user_delete, admin_users
+from .admin_api import (
+    admin_mentor_approve,
+    admin_mentor_reject,
+    admin_user_delete,
+    admin_user_verify_email,
+    admin_users,
+)
 from .views import (
     BookingViewSet,
     EventViewSet,
@@ -44,6 +50,7 @@ urlpatterns = [
     path("dashboard/admin/", admin_dashboard, name="dashboard-admin"),
     path("admin/users/", admin_users, name="admin-users"),
     path("admin/users/<int:pk>/", admin_user_delete, name="admin-user-delete"),
+    path("admin/users/<int:pk>/verify-email/", admin_user_verify_email, name="admin-user-verify-email"),
     path("admin/mentors/<int:pk>/approve/", admin_mentor_approve, name="admin-mentor-approve"),
     path("admin/mentors/<int:pk>/reject/", admin_mentor_reject, name="admin-mentor-reject"),
     path("saved-mentors/", saved_mentors, name="saved-mentors"),

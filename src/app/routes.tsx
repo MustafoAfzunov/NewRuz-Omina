@@ -163,9 +163,8 @@ export const router = createBrowserRouter([
         element: (
           <AdminUsersTable
             role="mentor"
-            title="Approved mentors"
+            title="All mentors"
             showMentorStatus
-            mentorStatusFilter="approved"
           />
         ),
       },

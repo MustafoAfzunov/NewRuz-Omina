@@ -19,7 +19,24 @@ Create an API key for CI/scripts: [Render Dashboard → Account → API Keys](ht
 export RENDER_API_KEY="rnd_..."
 ```
 
-## 2. Push code to Git
+## 2. Auto-deploy on every push
+
+`render.yaml` sets **`autoDeployTrigger: commit`** for **newruz-api** and **newruz-web**. After your repo is connected to Render:
+
+1. Commit and push to **`main`** on GitHub:
+   ```bash
+   git add .
+   git commit -m "Your message"
+   git push origin main
+   ```
+2. Render starts a new deploy for both services (usually within a minute).
+3. In the [Render Dashboard](https://dashboard.render.com/), each service → **Settings** → confirm **Auto-Deploy** is **On** and **Branch** is **main**.
+
+If pushes do not deploy: open your **Blueprint** → **Settings** → turn **Auto Sync** **On**, then **Manual Sync** once after updating `render.yaml`.
+
+**Important:** Render only sees changes you **push to GitHub**. Saving files locally does not redeploy production.
+
+## 3. Push code to Git
 
 Render deploys from **GitHub**, **GitLab**, or **Bitbucket** — not from your laptop alone.
 
@@ -38,7 +55,7 @@ git branch -M main
 git push -u origin main
 ```
 
-## 3. Deploy with Blueprint (recommended)
+## 4. Deploy with Blueprint (recommended)
 
 1. Open [Render Dashboard](https://dashboard.render.com/) → **New** → **Blueprint**
 2. Connect your GitHub account and select the **NewRuz** repository
@@ -55,7 +72,7 @@ After deploy:
 | Frontend | `https://newruz-web.onrender.com` |
 | API | `https://newruz-api.onrender.com/api/` |
 
-## 4. Post-deploy setup
+## 5. Post-deploy setup
 
 In the **newruz-api** service → **Environment**:
 
@@ -88,7 +105,7 @@ python manage.py createsuperuser
 
 Or from dashboard: **newruz-api** → **Shell**.
 
-## 5. CLI commands
+## 6. CLI commands
 
 Validate blueprint:
 
@@ -108,7 +125,7 @@ Trigger redeploy:
 render deploys create SERVICE_ID --confirm
 ```
 
-## 6. Free tier notes
+## 7. Free tier notes
 
 - Services spin down after inactivity; first request may take ~30s.
 - PostgreSQL free DB expires after 90 days (export data before then).

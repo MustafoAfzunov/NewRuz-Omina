@@ -358,6 +358,8 @@ export const api = {
   deleteAdminUser: (id: number) => authApiRequest<void>(`/admin/users/${id}/`, "DELETE"),
   approveMentor: (id: number) => authApiRequest<AdminUser>(`/admin/mentors/${id}/approve/`, "POST"),
   rejectMentor: (id: number) => authApiRequest<AdminUser>(`/admin/mentors/${id}/reject/`, "POST"),
+  verifyUserEmail: (id: number) =>
+    authApiRequest<AdminUser>(`/admin/users/${id}/verify-email/`, "POST"),
 
   createProgram: (payload: Omit<Program, "id" | "applied">) =>
     authApiRequest<Program>("/programs/", "POST", payload),

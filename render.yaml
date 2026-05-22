@@ -1,5 +1,6 @@
 # NewRuz — Render Blueprint (https://render.com/docs/blueprint-spec)
-# Deploy: push repo to GitHub/GitLab, then Dashboard → New → Blueprint
+# Auto-deploy: every push to `main` rebuilds newruz-api and newruz-web.
+# You must push to GitHub — local commits alone do not trigger Render.
 
 databases:
   - name: newruz-db
@@ -13,6 +14,9 @@ services:
     name: newruz-api
     runtime: python
     plan: free
+    repo: https://github.com/MustafoAfzunov/NewRuz-Omina
+    branch: main
+    autoDeployTrigger: commit
     rootDir: backend
     buildCommand: chmod +x build.sh && ./build.sh
     startCommand: gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --timeout 120 --workers 2
@@ -63,6 +67,9 @@ services:
   - type: web
     name: newruz-web
     runtime: static
+    repo: https://github.com/MustafoAfzunov/NewRuz-Omina
+    branch: main
+    autoDeployTrigger: commit
     buildCommand: npm install && VITE_API_URL="${NEWUZ_API_URL}/api" npm run build
     staticPublishPath: dist
     routes:

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Check, X } from "lucide-react";
+import { Check, Trash2, X } from "lucide-react";
 import { Button } from "../ui/button";
 import { api, type AdminUser } from "../../lib/api";
 
@@ -34,8 +34,26 @@ export function AdminMentorRequestsPage() {
     }
   };
 
+  const verifyEmail = async (id: number) => {
+    setActingId(id);
+    try {
+      const updated = await api.verifyUserEmail(id);
+      setPending((prev) => prev.map((u) => (u.id === id ? updated : u)));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not verify email.");
+    } finally {
+      setActingId(null);
+    }
+  };
+
   const reject = async (id: number) => {
-    if (!window.confirm("Reject this mentor application?")) return;
+    if (
+      !window.confirm(
+        "Reject this application? The account stays in the database (they cannot sign up again with the same email until you delete them under Mentors)."
+      )
+    ) {
+      return;
+    }
     setActingId(id);
     try {
       await api.rejectMentor(id);
@@ -47,11 +65,32 @@ export function AdminMentorRequestsPage() {
     }
   };
 
+  const removeAccount = async (user: AdminUser) => {
+    if (
+      !window.confirm(
+        `Permanently delete ${user.email}? They will be able to register again with this email.`
+      )
+    ) {
+      return;
+    }
+    setActingId(user.id);
+    try {
+      await api.deleteAdminUser(user.id);
+      setPending((prev) => prev.filter((u) => u.id !== user.id));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Delete failed.");
+    } finally {
+      setActingId(null);
+    }
+  };
+
   return (
     <div>
       <h1 className="text-2xl font-bold text-gray-900 mb-2">Mentor requests</h1>
       <p className="text-gray-600 mb-6">
-        New mentor registrations stay pending until you approve them.
+        New mentor registrations stay pending until you approve them.{" "}
+        <strong>Reject</strong> only marks them rejected (email still blocked). Use{" "}
+        <strong>Remove account</strong> if they should be able to sign up again.
       </p>
       {error ? <p className="text-sm text-red-600 mb-4">{error}</p> : null}
       {loading ? (
@@ -75,7 +114,17 @@ export function AdminMentorRequestsPage() {
                   {user.is_email_verified ? " · Email verified" : " · Email not verified"}
                 </p>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
+                {!user.is_email_verified ? (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={actingId === user.id}
+                    onClick={() => void verifyEmail(user.id)}
+                  >
+                    Mark email verified
+                  </Button>
+                ) : null}
                 <Button
                   type="button"
                   className="bg-green-600 hover:bg-green-700"
@@ -94,6 +143,16 @@ export function AdminMentorRequestsPage() {
                 >
                   <X className="w-4 h-4 mr-1" />
                   Reject
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="text-red-700 border-red-300"
+                  disabled={actingId === user.id}
+                  onClick={() => void removeAccount(user)}
+                >
+                  <Trash2 className="w-4 h-4 mr-1" />
+                  Remove account
                 </Button>
               </div>
             </div>

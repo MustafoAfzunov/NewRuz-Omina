@@ -81,6 +81,21 @@ def admin_mentor_approve(request, pk: int):
 
 @api_view(["POST"])
 @permission_classes([IsAdminRole])
+def admin_user_verify_email(request, pk: int):
+    """Mark email verified when Resend test sender cannot reach the user's inbox."""
+    try:
+        user = User.objects.get(pk=pk)
+    except User.DoesNotExist:
+        return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+    if user.is_email_verified:
+        return Response(AdminUserSerializer(user).data)
+    user.is_email_verified = True
+    user.save(update_fields=["is_email_verified"])
+    return Response(AdminUserSerializer(user).data)
+
+
+@api_view(["POST"])
+@permission_classes([IsAdminRole])
 def admin_mentor_reject(request, pk: int):
     try:
         user = User.objects.get(pk=pk, role=User.Role.MENTOR)
