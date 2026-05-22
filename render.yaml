@@ -1,0 +1,62 @@
+# NewRuz — Render Blueprint (https://render.com/docs/blueprint-spec)
+# Deploy: push repo to GitHub/GitLab, then Dashboard → New → Blueprint
+
+databases:
+  - name: newruz-db
+    databaseName: newruz
+    user: newruz
+    plan: free
+
+services:
+  # Django REST API
+  - type: web
+    name: newruz-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: chmod +x build.sh && ./build.sh
+    startCommand: gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
+    healthCheckPath: /api/programs/
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.0"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: newruz-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "false"
+      - key: FRONTEND_URL
+        fromService:
+          type: web
+          name: newruz-web
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: CORS_ALLOWED_ORIGINS
+        fromService:
+          type: web
+          name: newruz-web
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: CSRF_TRUSTED_ORIGINS
+        fromService:
+          type: web
+          name: newruz-web
+          envVarKey: RENDER_EXTERNAL_URL
+      # Set these in the Render dashboard after deploy (optional):
+      # EMAIL_BACKEND, EMAIL_HOST, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD
+      # GOOGLE_OAUTH_CLIENT_ID, GOOGLE_OAUTH_CLIENT_SECRET, GOOGLE_OAUTH_REDIRECT_URI
+
+  # Vite React frontend (static site)
+  - type: web
+    name: newruz-web
+    runtime: static
+    plan: free
+    buildCommand: npm install && VITE_API_URL="${NEWUZ_API_URL}/api" npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: NEWUZ_API_URL
+        fromService:
+          type: web
+          name: newruz-api
+          envVarKey: RENDER_EXTERNAL_URL

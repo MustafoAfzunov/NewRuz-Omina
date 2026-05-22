@@ -1,0 +1,24 @@
+@import 'tailwindcss' source(none);
+@import 'tw-animate-css';
+
+@source '../**/*.{js,ts,jsx,tsx}';
+
+@theme {
+  --font-headline: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --color-nr-primary: #4c30fa;
+  --color-nr-primary-dim: #3e17ef;
+  --color-nr-on-primary: #f5f1ff;
+  --color-nr-secondary-container: #cdcdff;
+  --color-nr-tertiary-container: #ce9bff;
+  --color-nr-on-tertiary-container: #4a0080;
+  --color-nr-surface: #f5f6f7;
+  --color-nr-on-surface: #2c2f30;
+  --color-nr-on-surface-variant: #595c5d;
+  --color-nr-surface-lowest: #ffffff;
+  --color-opp-primary: #330df2;
+  --color-opp-bg: #f6f5f8;
+  --font-display: "Lexend", ui-sans-serif, system-ui, sans-serif;
+  --color-prog-primary: #137fec;
+  --color-prog-bg: #f6f7f8;
+}
