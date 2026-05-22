@@ -122,7 +122,7 @@ export function AdminMentorRequestsPage() {
                     disabled={actingId === user.id}
                     onClick={() => void verifyEmail(user.id)}
                   >
-                    Mark email verified
+                    Verify email
                   </Button>
                 ) : null}
                 <Button

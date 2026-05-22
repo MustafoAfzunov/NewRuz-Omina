@@ -75,7 +75,8 @@ def admin_mentor_approve(request, pk: int):
         return Response({"detail": "Mentor not found."}, status=status.HTTP_404_NOT_FOUND)
     user.mentor_status = User.MentorStatus.APPROVED
     user.is_active = True
-    user.save(update_fields=["mentor_status", "is_active"])
+    user.is_email_verified = True
+    user.save(update_fields=["mentor_status", "is_active", "is_email_verified"])
     return Response(AdminUserSerializer(user).data)
 
 

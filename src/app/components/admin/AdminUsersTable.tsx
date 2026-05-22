@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Trash2 } from "lucide-react";
+import { MailCheck, Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
 import { api, type AdminUser } from "../../lib/api";
 
@@ -19,7 +19,7 @@ export function AdminUsersTable({
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [actingId, setActingId] = useState<number | null>(null);
 
   const load = useCallback(() => {
     setLoading(true);
@@ -37,18 +37,30 @@ export function AdminUsersTable({
     load();
   }, [load]);
 
+  const handleVerifyEmail = async (user: AdminUser) => {
+    setActingId(user.id);
+    try {
+      const updated = await api.verifyUserEmail(user.id);
+      setUsers((prev) => prev.map((u) => (u.id === user.id ? updated : u)));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not verify email.");
+    } finally {
+      setActingId(null);
+    }
+  };
+
   const handleDelete = async (user: AdminUser) => {
     if (!window.confirm(`Delete ${user.display_name} (${user.email})? This cannot be undone.`)) {
       return;
     }
-    setDeletingId(user.id);
+    setActingId(user.id);
     try {
       await api.deleteAdminUser(user.id);
       setUsers((prev) => prev.filter((u) => u.id !== user.id));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Delete failed.");
     } finally {
-      setDeletingId(null);
+      setActingId(null);
     }
   };
 
@@ -82,16 +94,31 @@ export function AdminUsersTable({
                   ) : null}
                   <td className="px-4 py-3">{user.is_email_verified ? "Yes" : "No"}</td>
                   <td className="px-4 py-3 text-right">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="text-red-600 border-red-200 hover:bg-red-50"
-                      disabled={deletingId === user.id}
-                      onClick={() => void handleDelete(user)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+                    <div className="flex justify-end gap-2">
+                      {!user.is_email_verified ? (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="text-blue-700 border-blue-200 hover:bg-blue-50"
+                          disabled={actingId === user.id}
+                          onClick={() => void handleVerifyEmail(user)}
+                        >
+                          <MailCheck className="w-4 h-4 mr-1" />
+                          Verify email
+                        </Button>
+                      ) : null}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="text-red-600 border-red-200 hover:bg-red-50"
+                        disabled={actingId === user.id}
+                        onClick={() => void handleDelete(user)}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               ))}
