@@ -9,7 +9,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from .email_verification import send_verification_email, user_id_from_token
+from .email_async import send_password_reset_email_async, send_verification_email_async
+from .email_verification import user_id_from_token
 from .password_reset import send_password_reset_email, user_id_from_reset_token
 from .serializers import (
     LoginSerializer,
@@ -39,14 +40,7 @@ def register_view(request):
     serializer = RegisterSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     user = serializer.save()
-
-    try:
-        send_verification_email(user)
-    except Exception as exc:
-        logger.exception("Failed to send verification email to %s", user.email)
-        user.delete()
-        detail = str(exc) if str(exc) else "Could not send verification email. Check email settings and try again."
-        return Response({"detail": detail}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+    send_verification_email_async(user)
 
     return Response(
         {

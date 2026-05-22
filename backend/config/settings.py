@@ -228,4 +228,4 @@ if EMAIL_BACKEND == "django.core.mail.backends.smtp.EmailBackend":
     EMAIL_USE_SSL = os.environ.get("EMAIL_USE_SSL", "false").lower() in ("1", "true", "yes")
     EMAIL_HOST_USER = _email_user
     EMAIL_HOST_PASSWORD = _email_password
-    EMAIL_TIMEOUT = int(os.environ.get("EMAIL_TIMEOUT", "30"))
+    EMAIL_TIMEOUT = int(os.environ.get("EMAIL_TIMEOUT", "15"))
