@@ -191,6 +191,28 @@ def me_view(request):
     return Response(_user_payload(request.user))
 
 
+@api_view(["GET"])
+def email_status_view(request):
+    """Debug email setup on production (no secrets returned)."""
+    from django.conf import settings
+
+    backend = getattr(settings, "EMAIL_BACKEND", "")
+    user = getattr(settings, "EMAIL_HOST_USER", "") or ""
+    return Response(
+        {
+            "email_backend": backend.split(".")[-1] if backend else "unknown",
+            "smtp_configured": "smtp" in backend and bool(user),
+            "has_email_user": bool(user),
+            "frontend_url": getattr(settings, "FRONTEND_URL", ""),
+            "debug": settings.DEBUG,
+            "hint": (
+                "Emails are sent via Gmail when smtp_configured is true. "
+                "If false, set EMAIL_HOST_USER and EMAIL_HOST_PASSWORD on newruz-api and redeploy."
+            ),
+        }
+    )
+
+
 @api_view(["POST"])
 def bootstrap_admin_view(request):
     """

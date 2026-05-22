@@ -56,11 +56,11 @@ services:
       - key: EMAIL_USE_TLS
         value: "true"
       - key: EMAIL_HOST_USER
-        sync: false
+        value: newruzuca@gmail.com
       - key: EMAIL_HOST_PASSWORD
         sync: false
       - key: DEFAULT_FROM_EMAIL
-        sync: false
+        value: NewRuz <newruzuca@gmail.com>
       # GOOGLE_OAUTH_CLIENT_ID, GOOGLE_OAUTH_CLIENT_SECRET, GOOGLE_OAUTH_REDIRECT_URI
 
   # Vite React frontend (static site — no "plan" field; static sites are free by default)
