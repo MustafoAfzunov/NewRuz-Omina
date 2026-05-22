@@ -49,18 +49,14 @@ services:
           type: web
           name: newruz-web
           envVarKey: RENDER_EXTERNAL_URL
-      - key: EMAIL_HOST
-        value: smtp.gmail.com
-      - key: EMAIL_PORT
-        value: "587"
-      - key: EMAIL_USE_TLS
-        value: "true"
-      - key: EMAIL_HOST_USER
-        value: newruzuca@gmail.com
-      - key: EMAIL_HOST_PASSWORD
+      # Render blocks SMTP (ports 587/465). Use Resend HTTPS API instead:
+      - key: RESEND_API_KEY
         sync: false
-      - key: DEFAULT_FROM_EMAIL
-        value: NewRuz <newruzuca@gmail.com>
+      - key: RESEND_FROM_EMAIL
+        value: NewRuz <onboarding@resend.dev>
+      # Optional: Gmail API (refresh token with gmail.send scope)
+      # - key: GOOGLE_MAIL_REFRESH_TOKEN
+      #   sync: false
       # GOOGLE_OAUTH_CLIENT_ID, GOOGLE_OAUTH_CLIENT_SECRET, GOOGLE_OAUTH_REDIRECT_URI
 
   # Vite React frontend (static site — no "plan" field; static sites are free by default)

@@ -183,18 +183,19 @@ def email_status_view(request):
     """Debug email setup on production (no secrets returned)."""
     from django.conf import settings
 
-    backend = getattr(settings, "EMAIL_BACKEND", "")
-    user = getattr(settings, "EMAIL_HOST_USER", "") or ""
+    from .email_send import delivery_method
+
+    method = delivery_method()
     return Response(
         {
-            "email_backend": backend.split(".")[-1] if backend else "unknown",
-            "smtp_configured": "smtp" in backend and bool(user),
-            "has_email_user": bool(user),
+            "delivery_method": method,
+            "smtp_configured": method in ("smtp", "gmail_api"),
+            "resend_configured": method == "resend",
             "frontend_url": getattr(settings, "FRONTEND_URL", ""),
             "debug": settings.DEBUG,
             "hint": (
-                "Emails are sent via Gmail when smtp_configured is true. "
-                "If false, set EMAIL_HOST_USER and EMAIL_HOST_PASSWORD on newruz-api and redeploy."
+                "Render blocks SMTP. Use RESEND_API_KEY (recommended) or GOOGLE_MAIL_REFRESH_TOKEN "
+                "with gmail.send scope on newruz-api."
             ),
         }
     )

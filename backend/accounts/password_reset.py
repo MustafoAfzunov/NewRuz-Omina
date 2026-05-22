@@ -3,7 +3,7 @@ import logging
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core import signing
-from django.core.mail import send_mail
+from .email_send import deliver_email
 
 logger = logging.getLogger(__name__)
 
@@ -33,12 +33,8 @@ def password_reset_link(user_id: int) -> str:
 
 
 def send_password_reset_email(user) -> None:
-    from .email_verification import _require_deliverable_email_backend
-
     if not user.email:
         raise ValueError("User has no email address.")
-
-    _require_deliverable_email_backend()
 
     link = password_reset_link(user.id)
     subject = "Reset your NewRuz password"
@@ -51,11 +47,4 @@ def send_password_reset_email(user) -> None:
         f"— The NewRuz Team"
     )
 
-    send_mail(
-        subject,
-        message,
-        settings.DEFAULT_FROM_EMAIL,
-        [user.email],
-        fail_silently=False,
-    )
-    logger.info("Password reset email sent to %s", user.email)
+    deliver_email(to=user.email, subject=subject, body=message)

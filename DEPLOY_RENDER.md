@@ -59,13 +59,23 @@ After deploy:
 
 In the **newruz-api** service → **Environment**:
 
+### Email (required for verification links)
+
+**Render blocks Gmail SMTP** (`Network is unreachable`). Use [Resend](https://resend.com) (free tier):
+
+1. Sign up at https://resend.com → **API Keys** → create key
+2. Add to **newruz-api** environment:
+   - `RESEND_API_KEY` = `re_...`
+   - `RESEND_FROM_EMAIL` = `NewRuz <onboarding@resend.dev>` (testing) or your verified domain address
+3. Redeploy **newruz-api**
+4. Check https://newruz-api.onrender.com/api/auth/email-status/ → `"delivery_method": "resend"`
+
+Until you verify a domain on Resend, `onboarding@resend.dev` may only deliver to the email you used for your Resend account. To email any user (e.g. mentees/mentors), add and verify your domain in Resend.
+
+### Google OAuth (optional)
+
 | Variable | Example |
 |----------|---------|
-| `EMAIL_BACKEND` | `django.core.mail.backends.smtp.EmailBackend` |
-| `EMAIL_HOST` | `smtp.gmail.com` |
-| `EMAIL_HOST_USER` | your Gmail |
-| `EMAIL_HOST_PASSWORD` | app password |
-| `DEFAULT_FROM_EMAIL` | `NewRuz <you@gmail.com>` |
 | `GOOGLE_OAUTH_REDIRECT_URI` | `https://newruz-web.onrender.com/oauth/google/callback` |
 
 Run migrations / create admin (one-off shell or locally against prod DB):
