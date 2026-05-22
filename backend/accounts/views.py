@@ -11,7 +11,7 @@ from rest_framework.response import Response
 
 from .email_async import send_password_reset_email_async, send_verification_email_async
 from .email_verification import user_id_from_token
-from .password_reset import send_password_reset_email, user_id_from_reset_token
+from .password_reset import user_id_from_reset_token
 from .serializers import (
     LoginSerializer,
     PasswordResetConfirmSerializer,
@@ -111,14 +111,7 @@ def resend_verification_view(request):
     if user.is_email_verified:
         return Response({"detail": "This email is already verified. You can sign in."})
 
-    try:
-        send_verification_email(user)
-    except Exception:
-        logger.exception("Failed to resend verification email to %s", user.email)
-        return Response(
-            {"detail": "Could not send verification email. Try again later."},
-            status=status.HTTP_503_SERVICE_UNAVAILABLE,
-        )
+    send_verification_email_async(user)
 
     return Response(
         {
@@ -241,14 +234,7 @@ def request_password_reset_view(request):
 
     user = User.objects.filter(email__iexact=email).first()
     if user:
-        try:
-            send_password_reset_email(user)
-        except Exception:
-            logger.exception("Failed to send password reset email to %s", email)
-            return Response(
-                {"detail": "Could not send reset email. Try again later."},
-                status=status.HTTP_503_SERVICE_UNAVAILABLE,
-            )
+        send_password_reset_email_async(user)
 
     return Response({"detail": PASSWORD_RESET_SENT_DETAIL})
 
