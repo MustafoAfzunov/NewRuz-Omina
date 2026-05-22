@@ -201,14 +201,31 @@ FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://127.0.0.1:5173")
 EMAIL_VERIFICATION_MAX_AGE = int(os.environ.get("EMAIL_VERIFICATION_MAX_AGE", str(60 * 60 * 48)))
 PASSWORD_RESET_MAX_AGE = int(os.environ.get("PASSWORD_RESET_MAX_AGE", str(60 * 60)))
 
-DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "NewRuz <noreply@newruz.local>")
+_email_user = os.environ.get("EMAIL_HOST_USER", "").strip()
+_email_password = os.environ.get("EMAIL_HOST_PASSWORD", "").replace(" ", "")
 
-_email_backend = os.environ.get("EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend")
-EMAIL_BACKEND = _email_backend
+# Use SMTP when credentials are set (Render does not load backend/.env — set vars in dashboard).
+if _email_user:
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+else:
+    EMAIL_BACKEND = os.environ.get(
+        "EMAIL_BACKEND",
+        "django.core.mail.backends.console.EmailBackend",
+    )
 
-if _email_backend == "django.core.mail.backends.smtp.EmailBackend":
+_default_from = os.environ.get("DEFAULT_FROM_EMAIL", "").strip()
+if _default_from and "<" not in _default_from:
+    DEFAULT_FROM_EMAIL = f"NewRuz <{_default_from}>"
+elif _default_from:
+    DEFAULT_FROM_EMAIL = _default_from
+else:
+    DEFAULT_FROM_EMAIL = "NewRuz <noreply@newruz.local>"
+
+if EMAIL_BACKEND == "django.core.mail.backends.smtp.EmailBackend":
     EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.gmail.com")
     EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
     EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "true").lower() in ("1", "true", "yes")
-    EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
-    EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
+    EMAIL_USE_SSL = os.environ.get("EMAIL_USE_SSL", "false").lower() in ("1", "true", "yes")
+    EMAIL_HOST_USER = _email_user
+    EMAIL_HOST_PASSWORD = _email_password
+    EMAIL_TIMEOUT = int(os.environ.get("EMAIL_TIMEOUT", "30"))

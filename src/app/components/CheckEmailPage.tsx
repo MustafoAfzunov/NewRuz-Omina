@@ -56,8 +56,8 @@ export function CheckEmailPage() {
               to verify your account. Mentees and mentors must verify before signing in.
             </p>
             <p className="text-xs text-gray-500 mb-6">
-              In development, the email body is printed in the Django server terminal (console
-              backend).
+              Check your spam folder. On the live site, the server must have Gmail SMTP configured
+              in Render (newruz-api environment variables).
             </p>
             {message ? <p className="text-sm text-green-700 mb-4">{message}</p> : null}
             {error ? <p className="text-sm text-red-600 mb-4">{error}</p> : null}

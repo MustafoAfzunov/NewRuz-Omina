@@ -32,9 +32,23 @@ def verification_link(user_id: int) -> str:
     return f"{frontend}/verify-email?token={token}"
 
 
+def _require_deliverable_email_backend() -> None:
+    backend = getattr(settings, "EMAIL_BACKEND", "")
+    if "console" in backend and not settings.DEBUG:
+        raise ValueError(
+            "Email is not configured for production. On Render, set EMAIL_HOST_USER, "
+            "EMAIL_HOST_PASSWORD (Gmail app password, no spaces), and related vars on newruz-api, "
+            "then redeploy."
+        )
+    if "smtp" in backend and not getattr(settings, "EMAIL_HOST_USER", ""):
+        raise ValueError("EMAIL_HOST_USER is missing for SMTP.")
+
+
 def send_verification_email(user) -> None:
     if not user.email:
         raise ValueError("User has no email address.")
+
+    _require_deliverable_email_backend()
 
     role_label = "Mentor" if user.role == User.Role.MENTOR else "Mentee"
     link = verification_link(user.id)

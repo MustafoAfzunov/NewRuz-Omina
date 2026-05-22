@@ -33,8 +33,12 @@ def password_reset_link(user_id: int) -> str:
 
 
 def send_password_reset_email(user) -> None:
+    from .email_verification import _require_deliverable_email_backend
+
     if not user.email:
         raise ValueError("User has no email address.")
+
+    _require_deliverable_email_backend()
 
     link = password_reset_link(user.id)
     subject = "Reset your NewRuz password"

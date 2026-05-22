@@ -42,15 +42,11 @@ def register_view(request):
 
     try:
         send_verification_email(user)
-    except Exception:
+    except Exception as exc:
         logger.exception("Failed to send verification email to %s", user.email)
         user.delete()
-        return Response(
-            {
-                "detail": "Could not send verification email. Check email settings and try again.",
-            },
-            status=status.HTTP_503_SERVICE_UNAVAILABLE,
-        )
+        detail = str(exc) if str(exc) else "Could not send verification email. Check email settings and try again."
+        return Response({"detail": detail}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
     return Response(
         {
