@@ -1,6 +1,7 @@
 from django.urls import path
 
 from .views import (
+    bootstrap_admin_view,
     confirm_password_reset_view,
     login_view,
     logout_view,
@@ -12,6 +13,7 @@ from .views import (
 )
 
 urlpatterns = [
+    path("bootstrap-admin/", bootstrap_admin_view, name="bootstrap-admin"),
     path("register/", register_view, name="register"),
     path("verify-email/", verify_email_view, name="verify-email"),
     path("resend-verification/", resend_verification_view, name="resend-verification"),

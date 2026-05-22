@@ -28,6 +28,12 @@ services:
         generateValue: true
       - key: DEBUG
         value: "false"
+      - key: ADMIN_EMAIL
+        value: ainulloevao@gmail.com
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: BOOTSTRAP_TOKEN
+        generateValue: true
       - key: FRONTEND_URL
         fromService:
           type: web

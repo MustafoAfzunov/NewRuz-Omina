@@ -1,6 +1,8 @@
 import logging
+import os
 
 from django.contrib.auth import authenticate, get_user_model
+from django.core.management import call_command
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
@@ -191,6 +193,27 @@ def logout_view(request):
 @permission_classes([IsAuthenticated])
 def me_view(request):
     return Response(_user_payload(request.user))
+
+
+@api_view(["POST"])
+def bootstrap_admin_view(request):
+    """
+    Create/update admin without Render Shell (free tier).
+    Set BOOTSTRAP_TOKEN in Render env, then POST with header X-Bootstrap-Token.
+    """
+    expected = os.environ.get("BOOTSTRAP_TOKEN", "")
+    provided = request.headers.get("X-Bootstrap-Token", "")
+    if not expected or provided != expected:
+        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    call_command("ensure_admin")
+    email = os.environ.get("ADMIN_EMAIL", "ainulloevao@gmail.com")
+    return Response(
+        {
+            "detail": "Admin account is ready. Sign in on the frontend with ADMIN_EMAIL and ADMIN_PASSWORD.",
+            "email": email,
+        }
+    )
 
 
 PASSWORD_RESET_SENT_DETAIL = (
