@@ -47,13 +47,16 @@ services:
       # EMAIL_BACKEND, EMAIL_HOST, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD
       # GOOGLE_OAUTH_CLIENT_ID, GOOGLE_OAUTH_CLIENT_SECRET, GOOGLE_OAUTH_REDIRECT_URI
 
-  # Vite React frontend (static site)
+  # Vite React frontend (static site — no "plan" field; static sites are free by default)
   - type: web
     name: newruz-web
     runtime: static
-    plan: free
     buildCommand: npm install && VITE_API_URL="${NEWUZ_API_URL}/api" npm run build
     staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
     envVars:
       - key: NEWUZ_API_URL
         fromService:
